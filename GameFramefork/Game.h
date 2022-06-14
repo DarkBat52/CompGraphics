@@ -10,8 +10,11 @@
 #include <iostream>
 #include <DirectXMath.h>
 
+#include "MathInclude.h"
+
 #include "DisplayWin32.h"
 #include "GameComponent.h"
+#include "Camera.h"
 
 
 
@@ -23,10 +26,41 @@ class InputDevice;
 class Camera;
 
 #pragma pack(push, 4)
+
+struct DirLight
+{
+	Vector3 direction = Vector3(0.0f, -1.0f, 0.0f);
+	float intensity = 1.0f;
+	Color color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+	Matrix WorldToLightClip;
+};
+
+struct CBPerDraw
+{
+	Matrix WorldToClip;
+	DirLight dirLight;
+	Vector3 CameraWorldPos;
+};
+
+struct LitMaterial
+{
+	float ambientCoef = 0.1f;
+	float specularCoef = 0.5f;
+	float specularExponent = 1.0f;
+	float diffuesCoef = 0.8f;
+};
+
+
 struct CBPerObject
 {
 	DirectX::SimpleMath::Matrix ObjectToWorld;
 	DirectX::SimpleMath::Vector4 Color;
+	Matrix NormalO2W;
+	LitMaterial Mat;
+	Matrix WorldToClip;
+	DirLight dirLight;
+	Vector3 CameraWorldPos;
+	float padding;
 };
 
 #pragma pack(pop)
@@ -90,7 +124,17 @@ public:
 		return comp;
 	}
 
+	DirLight DirectionalLight;
+	Camera LightCam;
 
+	ComPtr<ID3D11ShaderResourceView> GetShadowMapSRV() { return ShadowMapSRV; }
+	ComPtr<ID3D11SamplerState> GetShadowmapSamplerState() { return ShadowmapSamplerState; }
+
+	bool bIsRenderingShadowMap = false;
+
+	ComPtr<ID3D11SamplerState> GetDefaultSamplerState() { return DefaultSamplerState; }
+
+	//void DestroyComponent(GameComponent* GC);
 	
 
 private:
@@ -119,6 +163,15 @@ protected:
 	Color clearColor = { 0.945098f, 0.30588f, 0.3568627f, 1.0f };
 
 	Camera* currentCamera = nullptr;
+
+	ComPtr<ID3D11Texture2D> ShadowMapTex = nullptr;
+	ComPtr<ID3D11DepthStencilView> ShadowMapView = nullptr;
+	ComPtr<ID3D11ShaderResourceView> ShadowMapSRV = nullptr;
+
+	ComPtr<ID3D11SamplerState> DefaultSamplerState = nullptr;
+	ComPtr<ID3D11SamplerState> ShadowmapSamplerState = nullptr;
+
+	void createDefaultSamplerState();
 
 public:
 

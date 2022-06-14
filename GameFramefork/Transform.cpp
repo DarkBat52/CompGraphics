@@ -112,4 +112,16 @@ bool Transform::SetFromMatrix(Matrix Mat)
 	return Mat.Decompose(Scale, Rotation.Quat, Position);
 }
 
+Matrix Transform::GetNormalMatrix() const
+{
+	Transform tr = *this;
+	tr.Position = Vector3::Zero;
+	return tr.GetTransformMatrix().Invert().Transpose();
+}
 
+Matrix Transform::GetNormalMatrixTransposed() const
+{
+	Transform tr = *this;
+	tr.Position = Vector3::Zero;
+	return tr.GetTransformMatrix().Invert();
+}

@@ -157,8 +157,6 @@ HRESULT FPSCamGame::Update(float deltaTime)
 	cube->transform.Position += {0.0f, 0.05f * sin(TotalTime), 0.0f};
 	cube2->transform.Position += {0.0f, 0.05f * -sin(TotalTime), 0.0f};
 
-	std::cout << TotalTime << std::endl;
-
 	return 0;
 }
 

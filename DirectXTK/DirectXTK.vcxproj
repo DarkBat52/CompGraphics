@@ -19,12 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\DDSTextureLoader.cpp" />
+    <ClCompile Include="Src\DirectXHelpers.cpp" />
     <ClCompile Include="Src\pch.cpp" />
     <ClCompile Include="Src\SimpleMath.cpp" />
+    <ClCompile Include="Src\WICTextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Inc\DDSTextureLoader.h" />
+    <ClInclude Include="Inc\DirectXHelpers.h" />
+    <ClInclude Include="Inc\Effects.h" />
     <ClInclude Include="Inc\SimpleMath.h" />
+    <ClInclude Include="Inc\WICTextureLoader.h" />
+    <ClInclude Include="Src\DDS.h" />
+    <ClInclude Include="Src\LoaderHelpers.h" />
     <ClInclude Include="Src\pch.h" />
+    <ClInclude Include="Src\PlatformHelpers.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Inc\SimpleMath.inl" />

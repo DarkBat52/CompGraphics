@@ -10,10 +10,31 @@ struct PS_IN
 	float4 col : COLOR;
 };
 
+struct DirLight
+{
+	float3 direction;
+	float intensity;
+	float4 color;
+	matrix WorldToLightClip;
+};
+
+struct LitMaterial
+{
+	float ambientCoef;
+	float specularCoef;
+	float specularExponent;
+	float diffuseCoef;
+};
+
 cbuffer CBPerObject : register(b1)
 {
 	matrix ObjectToWorld;
 	float4 Color;
+	matrix NormalO2W;
+	LitMaterial Mat;
+	matrix WorldToClip;
+	DirLight dirLight;
+	float3 CameraWorldPos;
 };
 
 PS_IN VSMain(VS_IN input)

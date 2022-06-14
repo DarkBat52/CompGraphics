@@ -114,7 +114,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -130,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)DirectXTK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -155,6 +155,7 @@
     <ClCompile Include="GameFramefork.cpp" />
     <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TriangleComponent.cpp" />
     <ClCompile Include="TriApp.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="MathInclude.h" />
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="MeshComponent.h" />
+    <ClInclude Include="MeshLoader.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TriangleComponent.h" />
     <ClInclude Include="TriApp.h" />

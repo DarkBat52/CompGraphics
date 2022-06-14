@@ -58,8 +58,8 @@ struct Transform
 
 	bool SetFromMatrix(Matrix Mat);
 
-	//DirectX::XMFLOAT3X3 GetNormalMatrix() const;
+	Matrix GetNormalMatrix() const;
 
-	//std::string ToString() const;
+	Matrix GetNormalMatrixTransposed() const;
 };
 

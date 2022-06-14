@@ -2,10 +2,22 @@
 //
 
 #include <iostream>
+#include "KatamariGame.h"
+
+#include <iostream>
+
+using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	int a;
+	//cin >> a;
+
+	KatamariGame* game = new KatamariGame();
+
+	game->Run();
+
+	delete game;
 }
 
 
