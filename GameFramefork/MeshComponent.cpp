@@ -102,7 +102,7 @@ std::vector<D3D11_INPUT_ELEMENT_DESC> MeshComponent::returnInputElements()
 		D3D11_INPUT_ELEMENT_DESC{
 		"POSITION",
 		0,
-		DXGI_FORMAT_R32G32B32_FLOAT,
+		DXGI_FORMAT_R32G32B32A32_FLOAT,
 		0,
 		0,
 		D3D11_INPUT_PER_VERTEX_DATA,
@@ -227,7 +227,7 @@ HRESULT MeshComponent::Draw()
 	// todo: rename matrix or create a new constant buffer to house WorldToClipMatrix
 	CBPerObject cbData;
 	cbData.ObjectToWorld = game->GetCurrentCamera()->GetWorldToClipMatrix().Transpose() * GetWorldTransform().GetTransformMatrixTransposed();
-	cbData.Color = Color;
+	cbData.Color = color;
 	cbData.WorldToClip = game->GetCurrentCamera()->GetWorldToClipMatrix();
 	cbData.CameraWorldPos = game->GetCurrentCamera()->GetWorldTransform().Position;
 	cbData.NormalO2W = GetWorldTransform().GetNormalMatrixTransposed();

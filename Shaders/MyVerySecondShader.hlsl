@@ -88,7 +88,7 @@ float4 PSMain(PS_IN input) : SV_Target
 	float shadow = shadowMap.SampleCmp(shadowSampler, smUV, lightSpacePos.z - 0.003f);
 
 	col.xyz = col.xyz * (lightAmbient + (lightDiffuse + lightSpecular) * shadow) * dirLight.color;
-
+	//col.xyz = normal * 0.5f + 0.5f;
 
 
 	//col.xyz = shadow.xxx;

@@ -112,14 +112,57 @@ HRESULT Game::PrepareResources()
 	input = new InputDevice();
 
 	CreateBackBuffer();
+
+	// Create shadowmap sampler state
+	D3D11_SAMPLER_DESC smSampDesc;
+	ZeroMemory(&smSampDesc, sizeof(smSampDesc));
+	smSampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	smSampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	smSampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	smSampDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	smSampDesc.BorderColor[0] = 1.0f;
+	smSampDesc.BorderColor[1] = 1.0f;
+	smSampDesc.BorderColor[2] = 1.0f;
+	smSampDesc.BorderColor[3] = 1.0f;
+	smSampDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+	smSampDesc.MinLOD = 0;
+	smSampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	Device->CreateSamplerState(&smSampDesc, ShadowmapSamplerState.GetAddressOf());
+
+	// Create shadowmap texture
+	D3D11_TEXTURE2D_DESC descSM;
+	descSM.Width = 2048;
+	descSM.Height = 2048;
+	descSM.MipLevels = 1;
+	descSM.ArraySize = 1;
+	descSM.Format = DXGI_FORMAT_R32_TYPELESS;
+	descSM.SampleDesc.Count = 1;
+	descSM.SampleDesc.Quality = 0;
+	descSM.Usage = D3D11_USAGE_DEFAULT;
+	descSM.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	descSM.CPUAccessFlags = 0;
+	descSM.MiscFlags = 0;
+	res = Device->CreateTexture2D(&descSM, NULL, ShadowMapTex.GetAddressOf());
+
+	// Create the depth stencil view for shadowmap
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+	ZeroMemory(&descDSV, sizeof(descDSV));
+	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0;
+	res = Device->CreateDepthStencilView(ShadowMapTex.Get(), &descDSV, ShadowMapView.GetAddressOf());
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC smSRVDesc;
+	//ZeroMemory(&smSRVDesc, sizeof(smSRVDesc));
+	smSRVDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	smSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	smSRVDesc.Texture2D.MostDetailedMip = 0;
+	smSRVDesc.Texture2D.MipLevels = descSM.MipLevels;
+	Device->CreateShaderResourceView(ShadowMapTex.Get(), &smSRVDesc, ShadowMapSRV.GetAddressOf());
+
 	createDefaultSamplerState();
 
 
-	
-
-	for (GameComponent* g : Components) {
-		g->Initialize();
-	}
 
 	D3D11_VIEWPORT viewport = {};
 	viewport.Width = static_cast<float>(Game::Get()->Display->ClientWidth);
@@ -154,12 +197,48 @@ HRESULT Game::PrepareResources()
 
 HRESULT Game::Draw()
 {	
+
+	bIsRenderingShadowMap = true;
+	//Context->PSSetShaderResources(1, 1, nullptr);
+	Context->OMSetRenderTargets(0, nullptr, ShadowMapView.Get());
+	{
+		D3D11_VIEWPORT viewport = {};
+		viewport.Width = 2048;
+		viewport.Height = 2048;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		Context->RSSetViewports(1, &viewport);
+		Context->ClearDepthStencilView(ShadowMapView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+		for (GameComponent* g : Components) {
+			g->Draw();
+		}
+
+	}
+
+	bIsRenderingShadowMap = false;
+
+	D3D11_VIEWPORT viewport = {};
+	viewport.Width = static_cast<float>(Game::Get()->Display->ClientWidth);
+	viewport.Height = static_cast<float>(Game::Get()->Display->ClientHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
+	Context->RSSetViewports(1, &viewport);
+
 	Context->OMSetRenderTargets(1, RenderView.GetAddressOf(), DepthStencilView.Get());
 
 	float color[] = { 0.945098f, 0.30588f, 0.3568627f, 1.0f };
 	//float color[] = { 0.945098f, 0.30588f, 0.3568627f, 1.0f }; // pong pink
 	Context->ClearRenderTargetView(RenderView.Get(), clearColor);
 	Context->ClearDepthStencilView(DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	
 
 	HRESULT res = 0;
 	for (GameComponent* g : Components) {
@@ -209,6 +288,10 @@ void Game::createDefaultSamplerState()
 HRESULT Game::Run()
 {
 	HRESULT res = PrepareResources();
+
+	for (GameComponent* g : Components) {
+		g->Initialize();
+	}
 
 	auto PrevTime = std::chrono::steady_clock::now();
 

@@ -156,6 +156,7 @@
     <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
+    <ClCompile Include="SphereCollisionComponent.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TriangleComponent.cpp" />
     <ClCompile Include="TriApp.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="MeshLoader.h" />
+    <ClInclude Include="SphereCollisionComponent.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TriangleComponent.h" />
     <ClInclude Include="TriApp.h" />

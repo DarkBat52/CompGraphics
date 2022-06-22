@@ -26,6 +26,8 @@ public:
 protected:
     virtual std::vector<D3D11_INPUT_ELEMENT_DESC> returnInputElements() override;
 
+    virtual HRESULT createVertexBuffer() override;
+
 private:
     std::vector<TexturedVertex> texturedVertices;
 

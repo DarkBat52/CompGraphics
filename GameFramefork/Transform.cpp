@@ -125,3 +125,15 @@ Matrix Transform::GetNormalMatrixTransposed() const
 	tr.Position = Vector3::Zero;
 	return tr.GetTransformMatrix().Invert();
 }
+
+void Rotator::RotateAroundLocalAxis(const Vector3& axis, float Angle)
+{
+	Quat.Concatenate(Quat, DirectX::XMQuaternionRotationAxis(axis, Angle), Quat);
+}
+
+void Rotator::RotateAroundAxis(const Vector3& axis, float Angle)
+{
+	Quaternion q;
+	Quat.Inverse(q);
+	RotateAroundLocalAxis(DirectX::XMVector3Rotate(axis, q), Angle);
+}

@@ -47,13 +47,21 @@ HRESULT FBXMeshComponent::Draw()
 	Game* game = Game::Get();
 
 	CBPerObject cbData;
-	cbData.ObjectToWorld = game->GetCurrentCamera()->GetWorldToClipMatrix().Transpose() * GetWorldTransform().GetTransformMatrixTransposed();
-	cbData.Color = Color;
-	cbData.WorldToClip = game->GetCurrentCamera()->GetWorldToClipMatrix();
+	cbData.ObjectToWorld = GetWorldTransform().GetTransformMatrixTransposed();
+	cbData.Color = color;
+	cbData.WorldToClip = game->GetCurrentCamera()->GetWorldToClipMatrix().Transpose();
 	cbData.CameraWorldPos = game->GetCurrentCamera()->GetWorldTransform().Position;
 	cbData.NormalO2W = GetWorldTransform().GetNormalMatrixTransposed();
 	cbData.Mat = { 0.1f, 0.5f, 1.0f, 0.8f };
-	cbData.dirLight = DirLight();
+	cbData.dirLight.direction = game->LightCam.GetWorldTransform().Rotation.GetForwardVector();
+	cbData.dirLight.WorldToLightClip = game->LightCam.GetWorldToClipMatrix();
+
+	if (game->bIsRenderingShadowMap)
+	{
+		cbData.WorldToClip = game->LightCam.GetWorldToClipMatrix();
+		Game::Get()->Context->PSSetShader(nullptr, nullptr, 0);
+
+	}
 
 	ComPtr<ID3D11SamplerState> defaultSamplerState = game->GetDefaultSamplerState();
 
@@ -64,7 +72,7 @@ HRESULT FBXMeshComponent::Draw()
 
 	Game::Get()->Context->Unmap(Game::Get()->GetPerObjectConstantBuffer().Get(), 0);
 
-	UINT strides[] = { 32 };
+	UINT strides[] = { sizeof(TexturedVertex) };
 	UINT offsets[] = { 0 };
 
 	Game::Get()->Context->IASetInputLayout(layout.Get());
@@ -72,7 +80,6 @@ HRESULT FBXMeshComponent::Draw()
 	Game::Get()->Context->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
 	Game::Get()->Context->IASetVertexBuffers(0, 1, vb.GetAddressOf(), strides, offsets);
 	Game::Get()->Context->VSSetShader(vertexShader.Get(), nullptr, 0);
-	Game::Get()->Context->PSSetShader(pixelShader.Get(), nullptr, 0);
 
 	//textures
 
@@ -82,6 +89,15 @@ HRESULT FBXMeshComponent::Draw()
 		game->Context->PSSetSamplers(0, 1, defaultSamplerState.GetAddressOf());
 	}
 
+	if (!game->bIsRenderingShadowMap)
+	{
+		Game::Get()->Context->PSSetShader(pixelShader.Get(), nullptr, 0);
+		game->Context->PSSetShaderResources(1, 1, game->GetShadowMapSRV().GetAddressOf());
+		game->Context->PSSetSamplers(1, 1, game->GetShadowmapSamplerState().GetAddressOf());
+	}
+
+	Game::Get()->Context->VSSetConstantBuffers(0, 1, game->PerObjectCB.GetAddressOf());
+	Game::Get()->Context->PSSetConstantBuffers(0, 1, game->PerObjectCB.GetAddressOf());
 
 	Game::Get()->Context->DrawIndexed(indices.size(), 0, 0);
 
@@ -99,7 +115,7 @@ std::vector<D3D11_INPUT_ELEMENT_DESC> FBXMeshComponent::returnInputElements()
 		{
 			"POSITION",
 			0,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_R32G32B32_FLOAT,
 			0,
 			0,
 			D3D11_INPUT_PER_VERTEX_DATA,
@@ -134,6 +150,27 @@ std::vector<D3D11_INPUT_ELEMENT_DESC> FBXMeshComponent::returnInputElements()
 
 
 	return inputElementsVector;
+}
+
+HRESULT FBXMeshComponent::createVertexBuffer()
+{
+	D3D11_BUFFER_DESC vertexBufDesc = {};
+	vertexBufDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufDesc.CPUAccessFlags = 0;
+	vertexBufDesc.MiscFlags = 0;
+	vertexBufDesc.StructureByteStride = 0;
+	vertexBufDesc.ByteWidth = sizeof(TexturedVertex) * texturedVertices.size();
+
+	D3D11_SUBRESOURCE_DATA vertexData = {};
+	vertexData.pSysMem = &texturedVertices[0];
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+
+	Game::Get()->Device->CreateBuffer(&vertexBufDesc, &vertexData, vb.GetAddressOf());
+
+	return 0;
 }
 
 

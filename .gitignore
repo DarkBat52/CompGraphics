@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Meshes/Chess Board.FBX
+/Textures/Chess Board.jpg
+/Textures/Marvel.jpg
+/Textures/White.jpg
+/Textures/Black Pieces.jpg
+/Textures/Black.jpg
+/Textures/Board.jpg

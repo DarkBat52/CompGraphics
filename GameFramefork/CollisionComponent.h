@@ -19,5 +19,9 @@ public:
     virtual const bool doesIntersect(const class AABBCollisionComponent& other) const {
         return false;
     };
+
+    virtual const bool doesIntersect(const class SphereCollisionComponent& other) const {
+        return false;
+    }
 };
 

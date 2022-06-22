@@ -52,7 +52,7 @@ protected:
 	ComPtr<ID3D11Buffer> vb;
 	ComPtr<ID3D11Buffer> ib;
 
-	Vector4 Color;
+	Color color = Color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	std::vector<XMFLOAT4> vertices;
 	std::vector<int> indices;

@@ -35,6 +35,10 @@ public:
 
 	Quaternion GetQuaterion() const;
 
+	void RotateAroundLocalAxis(const Vector3& axis, float Angle);
+
+	void RotateAroundAxis(const Vector3& axis, float Angle);
+
 	friend struct Transform;
 };
 
